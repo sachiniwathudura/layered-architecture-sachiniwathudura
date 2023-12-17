@@ -69,4 +69,35 @@ public class CustomerDAOImpl implements CustomerDAO{
                 return "C00-001";
             }
         }
+
+    public CustomerDTO searchCustomer(String id) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getDbConnection().getConnection();
+        PreparedStatement pstm = connection.prepareStatement("SELECT * FROM Customer WHERE id=?");
+        pstm.setString(1, id + "");
+        ResultSet rst = pstm.executeQuery();
+        rst.next();
+        return new CustomerDTO(
+                rst.getString(1),
+                rst.getString(2),
+                rst.getString(3)
+        );
+    }
+
+    public ArrayList <CustomerDTO> loadAllCustomerIds() throws SQLException,ClassNotFoundException{
+        Connection connection = DBConnection.getDbConnection().getConnection();
+        Statement stm = connection.createStatement();
+        ResultSet rst = stm.executeQuery("SELECT * FROM Customer");
+
+        ArrayList <CustomerDTO> allCustomerId = new ArrayList<>();
+
+        while (rst.next()){
+            allCustomerId.add(new CustomerDTO(
+                    rst.getString(1),
+                    rst.getString(2),
+                    rst.getString(3)
+
+            ));
+        }
+        return allCustomerId;
+    }
 }

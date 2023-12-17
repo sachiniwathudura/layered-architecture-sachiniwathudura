@@ -6,7 +6,7 @@ import com.example.layeredarchitecture.model.ItemDTO;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ItemDAOImpl implements ItemDAO{
+public class ItemDAOImpl implements ItemDAO {
 
     @Override
     public ArrayList<ItemDTO> getAllItem() throws SQLException, ClassNotFoundException {
@@ -16,7 +16,7 @@ public class ItemDAOImpl implements ItemDAO{
 
         ArrayList<ItemDTO> allItem = new ArrayList<>();
 
-        while (rst.next()){
+        while (rst.next()) {
             ItemDTO itemDTO = new ItemDTO(
                     rst.getString("code"),
                     rst.getString("description"),
@@ -27,6 +27,7 @@ public class ItemDAOImpl implements ItemDAO{
 
         return allItem;
     }
+
     @Override
     public boolean saveItem(ItemDTO dto) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -38,6 +39,7 @@ public class ItemDAOImpl implements ItemDAO{
         pstm.executeUpdate();
         return false;
     }
+
     @Override
     public boolean updateItem(ItemDTO dto) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -45,16 +47,18 @@ public class ItemDAOImpl implements ItemDAO{
         pstm.setString(1, dto.getDescription());
         pstm.setBigDecimal(2, dto.getUnitPrice());
         pstm.setInt(3, dto.getQtyOnHand());
-        pstm.setString(4,dto.getCode());
+        pstm.setString(4, dto.getCode());
         return pstm.executeUpdate() > 0;
     }
+
     @Override
     public boolean deleteItem(String code) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement pstm = connection.prepareStatement("DELETE FROM Item WHERE code=?");
         pstm.setString(1, code);
-         return pstm.executeUpdate()>0;
+        return pstm.executeUpdate() > 0;
     }
+
     @Override
     public boolean exsistItem(String code) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -62,6 +66,7 @@ public class ItemDAOImpl implements ItemDAO{
         pstm.setString(1, code);
         return pstm.executeQuery().next();
     }
+
     @Override
     public String generateNewId() throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -74,4 +79,39 @@ public class ItemDAOImpl implements ItemDAO{
             return "I00-001";
         }
     }
+
+    @Override
+    public ItemDTO findItem(String newItemCode) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getDbConnection().getConnection();
+        PreparedStatement pstm = connection.prepareStatement("SELECT * FROM Item WHERE code=?");
+        pstm.setString(1, newItemCode + "");
+        ResultSet rst = pstm.executeQuery();
+        rst.next();
+        return new ItemDTO(
+                rst.getString(1),
+                rst.getString(2),
+                rst.getBigDecimal(3),
+                rst.getInt(4)
+        );
+    }
+
+    @Override
+    public ArrayList<ItemDTO> loadAllItemCodes() throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getDbConnection().getConnection();
+        Statement stm = connection.createStatement();
+        ResultSet rst = stm.executeQuery("SELECT * FROM Item");
+        ArrayList<ItemDTO> allItemCodes = new ArrayList<>();
+
+        while (rst.next()) {
+            allItemCodes.add(new ItemDTO(
+                    rst.getString(1),
+                    rst.getString(2),
+                    rst.getBigDecimal(3),
+                    rst.getInt(4)
+            ));
+        }
+        return allItemCodes;
+    }
+
 }
+

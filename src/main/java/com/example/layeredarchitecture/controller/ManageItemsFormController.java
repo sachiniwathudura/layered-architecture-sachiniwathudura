@@ -129,7 +129,7 @@ public class ManageItemsFormController {
         txtUnitPrice.setDisable(false);
         txtQtyOnHand.setDisable(false);
         txtCode.clear();
-      //  txtCode.setText(generateNewId());
+        txtCode.setText(generateNewId());
         txtDescription.clear();
         txtUnitPrice.clear();
         txtQtyOnHand.clear();
@@ -236,7 +236,7 @@ public class ManageItemsFormController {
     private String generateNewId() {
         try {
             ItemDAO itemDAO=new ItemDAOImpl();
-            return ((ItemDAOImpl) itemDAO).generateNewId();
+            return ((ItemDAO) itemDAO).generateNewId();
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
         } catch (ClassNotFoundException e) {
