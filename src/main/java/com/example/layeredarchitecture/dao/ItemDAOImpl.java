@@ -42,47 +42,52 @@ public class ItemDAOImpl implements ItemDAO {
 
     @Override
     public boolean updateItem(ItemDTO dto) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
+       /* Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement pstm = connection.prepareStatement("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?");
         pstm.setString(1, dto.getDescription());
         pstm.setBigDecimal(2, dto.getUnitPrice());
         pstm.setInt(3, dto.getQtyOnHand());
         pstm.setString(4, dto.getCode());
-        return pstm.executeUpdate() > 0;
+        return pstm.executeUpdate() > 0;*/
+        return SQLUtil.execute("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?");
     }
 
     @Override
     public boolean deleteItem(String code) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
+       /* Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement pstm = connection.prepareStatement("DELETE FROM Item WHERE code=?");
         pstm.setString(1, code);
-        return pstm.executeUpdate() > 0;
+        return pstm.executeUpdate() > 0;*/
+        return SQLUtil.execute("DELETE FROM Item WHERE code=?");
+
     }
 
     @Override
     public boolean exsistItem(String code) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
+        /*Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement pstm = connection.prepareStatement("SELECT code FROM Item WHERE code=?");
         pstm.setString(1, code);
-        return pstm.executeQuery().next();
+        return pstm.executeQuery().next();*/
+        return SQLUtil.execute("SELECT code FROM Item WHERE code=?");
     }
 
     @Override
     public String generateNewId() throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
+        /*Connection connection = DBConnection.getDbConnection().getConnection();
         ResultSet rst = connection.createStatement().executeQuery("SELECT code FROM Item ORDER BY code DESC LIMIT 1;");
         if (rst.next()) {
             String id = rst.getString("code");
             int newItemId = Integer.parseInt(id.replace("I00-", "")) + 1;
             return String.format("I00-%03d", newItemId);
         } else {
-            return "I00-001";
-        }
+            return "I00-001";*/
+        return SQLUtil.execute("SELECT code FROM Item ORDER BY code DESC LIMIT 1;");
     }
+
 
     @Override
     public ItemDTO findItem(String newItemCode) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
+       /* Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement pstm = connection.prepareStatement("SELECT * FROM Item WHERE code=?");
         pstm.setString(1, newItemCode + "");
         ResultSet rst = pstm.executeQuery();
@@ -92,12 +97,13 @@ public class ItemDAOImpl implements ItemDAO {
                 rst.getString(2),
                 rst.getBigDecimal(3),
                 rst.getInt(4)
-        );
+        );*/
+        return SQLUtil.execute("SELECT * FROM Item WHERE code=?");
     }
 
     @Override
     public ArrayList<ItemDTO> loadAllItemCodes() throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
+       /* Connection connection = DBConnection.getDbConnection().getConnection();
         Statement stm = connection.createStatement();
         ResultSet rst = stm.executeQuery("SELECT * FROM Item");
         ArrayList<ItemDTO> allItemCodes = new ArrayList<>();
@@ -111,7 +117,9 @@ public class ItemDAOImpl implements ItemDAO {
             ));
         }
         return allItemCodes;
-    }
+    }*/
+        return SQLUtil.execute("SELECT * FROM Item");
 
+    }
 }
 

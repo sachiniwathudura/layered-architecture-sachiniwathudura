@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public  class OrderDetailDAOImpl implements OrderDetailDAO{
 
     public boolean saveOrderDetail(String orderId, OrderDetailDTO dto) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
+        /*Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement stm = connection.prepareStatement("INSERT INTO OrderDetails (oid, itemCode, unitPrice, qty) VALUES (?,?,?,?)");
         stm.setString(1, orderId);
         stm.setString(2, dto.getItemCode());
@@ -26,6 +26,7 @@ public  class OrderDetailDAOImpl implements OrderDetailDAO{
         connection.rollback();
         DBConnection.getDbConnection().getConnection().setAutoCommit(false);
         return false;
+    }*/
+        return SQLUtil.execute("INSERT INTO OrderDetails (oid, itemCode, unitPrice, qty) VALUES (?,?,?,?)");
     }
-
 }
