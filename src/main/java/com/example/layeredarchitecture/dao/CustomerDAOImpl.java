@@ -82,6 +82,17 @@ public class CustomerDAOImpl implements CustomerDAO{
             ));
         }
         return allCustomerId;*/
-        return  SQLUtil.execute("SELECT * FROM Customer");
+        ResultSet rst = SQLUtil.execute("SELECT * FROM Customer");
+        ArrayList <CustomerDTO> allCustomerId = new ArrayList<>();
+
+        while (rst.next()){
+            allCustomerId.add(new CustomerDTO(
+                    rst.getString(1),
+                    rst.getString(2),
+                    rst.getString(3)
+
+            ));
+        }
+        return allCustomerId;
     }
 }
