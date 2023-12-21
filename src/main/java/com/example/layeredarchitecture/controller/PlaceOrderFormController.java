@@ -1,6 +1,13 @@
 package com.example.layeredarchitecture.controller;
 
-import com.example.layeredarchitecture.dao.*;
+import com.example.layeredarchitecture.dao.custom.CustomerDAO;
+import com.example.layeredarchitecture.dao.custom.ItemDAO;
+import com.example.layeredarchitecture.dao.custom.OrderDAO;
+import com.example.layeredarchitecture.dao.custom.OrderDetailDAO;
+import com.example.layeredarchitecture.dao.custom.impl.CustomerDAOImpl;
+import com.example.layeredarchitecture.dao.custom.impl.ItemDAOImpl;
+import com.example.layeredarchitecture.dao.custom.impl.OrderDAOImpl;
+import com.example.layeredarchitecture.dao.custom.impl.OrderDetailDAOImpl;
 import com.example.layeredarchitecture.db.DBConnection;
 import com.example.layeredarchitecture.model.CustomerDTO;
 import com.example.layeredarchitecture.model.ItemDTO;
@@ -111,7 +118,7 @@ public class PlaceOrderFormController {
                         pstm.setString(1, newValue + "");
                         ResultSet rst = pstm.executeQuery();
                         rst.next();*/
-                        CustomerDTO dto= customerDAO.searchCustomer(newValue);
+                        CustomerDTO dto= customerDAO.search(newValue);
                         CustomerDTO customerDTO = new CustomerDTO(newValue + "", dto.getName(), dto.getAddress());
 
                         txtCustomerName.setText(customerDTO.getName());
@@ -197,7 +204,7 @@ public class PlaceOrderFormController {
         PreparedStatement pstm = connection.prepareStatement("SELECT code FROM Item WHERE code=?");
         pstm.setString(1, code);
         return pstm.executeQuery().next();*/
-        return itemDAO.exsistItem(code);
+        return itemDAO.exsit(code);
     }
 
     boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
@@ -205,7 +212,7 @@ public class PlaceOrderFormController {
         PreparedStatement pstm = connection.prepareStatement("SELECT id FROM Customer WHERE id=?");
         pstm.setString(1, id);
         return pstm.executeQuery().next();*/
-        return customerDAO.exsitCustomer(id);
+        return customerDAO.exsit(id);
     }
 
     public String generateNewOrderId() {
@@ -215,7 +222,7 @@ public class PlaceOrderFormController {
             ResultSet rst = stm.executeQuery("SELECT oid FROM `Orders` ORDER BY oid DESC LIMIT 1;");*/
 
            // return rst.next() ? String.format("OID-%03d", (Integer.parseInt(rst.getString("oid").replace("OID-", "")) + 1)) : "OID-001";
-            ResultSet rst=orderDAO.generateNewOrderId();
+            ResultSet rst=orderDAO.generateNewId();
 
             return rst.next() ? String.format("OID-%03d", (Integer.parseInt(rst.getString("oid").replace("OID-", "")) + 1)) : "OID-001";
         } catch (SQLException e) {
@@ -228,18 +235,13 @@ public class PlaceOrderFormController {
 
     private void loadAllCustomerIds() {
         try {
-          /*  Connection connection = DBConnection.getDbConnection().getConnection();
-            Statement stm = connection.createStatement();
-            ResultSet rst = stm.executeQuery("SELECT * FROM Customer");*/
-
-            ArrayList<CustomerDTO> allCustomerIds = customerDAO.loadAllCustomerIds();
+            ArrayList<CustomerDTO> allCustomerIds = customerDAO.loadAllIds();
             for (CustomerDTO dto:allCustomerIds) {
                 cmbCustomerId.getItems().add(dto.getId());
             }
             /*while (rst.next()) {
                 cmbCustomerId.getItems().add(rst.getString("id"));
             }*/
-
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to load customer ids").show();
         } catch (ClassNotFoundException e) {
@@ -250,13 +252,7 @@ public class PlaceOrderFormController {
     private void loadAllItemCodes() {
         try {
             /*Get all items*/
-            /*Connection connection = DBConnection.getDbConnection().getConnection();
-            Statement stm = connection.createStatement();
-            ResultSet rst = stm.executeQuery("SELECT * FROM Item");
-            while (rst.next()) {
-                cmbItemCode.getItems().add(rst.getString("code"));
-            }*/
-            ArrayList<ItemDTO> allItemCodes = itemDAO.loadAllItemCodes();
+            ArrayList<ItemDTO> allItemCodes = itemDAO.loadAllCodes();
             for (ItemDTO itemDTO:allItemCodes) {
                 cmbItemCode.getItems().add(itemDTO.getCode());
             }
@@ -359,15 +355,6 @@ public class PlaceOrderFormController {
         boolean isOrderDetailSaved=false;
         boolean isUpdated=false;
         try {
-           /* connection = DBConnection.getDbConnection().getConnection();
-            PreparedStatement stm = connection.prepareStatement("SELECT oid FROM `Orders` WHERE oid=?");
-            stm.setString(1, orderId);*/
-
-            /*if order id already exist*/
-          //  if (stm.executeQuery().next()) {
-
-          //  }
-
             orderDAO.selectOrderId(orderId);
             isOrderSaved=orderDAO.saveOrder(orderId,orderDate,customerId);
 
@@ -403,13 +390,7 @@ public class PlaceOrderFormController {
                 ItemDTO item = findItem(detail.getItemCode());
                 item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
 
-                /*PreparedStatement pstm = connection.prepareStatement("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?");
-                pstm.setString(1, item.getDescription());
-                pstm.setBigDecimal(2, item.getUnitPrice());
-                pstm.setInt(3, item.getQtyOnHand());
-                pstm.setString(4, item.getCode());*/
-
-                isUpdated = itemDAO.updateItem(item);
+                isUpdated = itemDAO.update(item);
 
                 //  itemDAO.updateItem(dto);
 
@@ -441,12 +422,6 @@ public class PlaceOrderFormController {
 
     public ItemDTO findItem(String code) {
         try {
-           /* Connection connection = DBConnection.getDbConnection().getConnection();
-            PreparedStatement pstm = connection.prepareStatement("SELECT * FROM Item WHERE code=?");
-            pstm.setString(1, code);
-            ResultSet rst = pstm.executeQuery();
-            rst.next();*/
-            //return new ItemDTO(code, rst.getString("description"), rst.getBigDecimal("unitPrice"), rst.getInt("qtyOnHand"));
 
             ItemDTO dto=itemDAO.findItem(code);
             return new ItemDTO(code, dto.getDescription(),dto.getUnitPrice(),dto.getQtyOnHand());
