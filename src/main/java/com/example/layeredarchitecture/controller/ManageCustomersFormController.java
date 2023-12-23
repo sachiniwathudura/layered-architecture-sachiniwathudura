@@ -1,5 +1,6 @@
 package com.example.layeredarchitecture.controller;
 
+import com.example.layeredarchitecture.bo.CustomerBOImpl;
 import com.example.layeredarchitecture.dao.custom.impl.CustomerDAOImpl;
 import com.example.layeredarchitecture.model.CustomerDTO;
 import com.example.layeredarchitecture.view.tdm.CustomerTM;
@@ -37,7 +38,8 @@ public class ManageCustomersFormController {
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
 
-    CustomerDAOImpl customerDAO = new CustomerDAOImpl();
+   // CustomerDAOImpl customerDAO = new CustomerDAOImpl();
+   CustomerBOImpl customerBO = new CustomerBOImpl();
 
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -70,7 +72,7 @@ public class ManageCustomersFormController {
         tblCustomers.getItems().clear();
         /*Get all customers*/
         try {
-            ArrayList<CustomerDTO> allCustomer = customerDAO.getAll();
+            ArrayList<CustomerDTO> allCustomer = customerBO.getAllCustomer();
 
             for (CustomerDTO dto:allCustomer ){
                 tblCustomers.getItems().add(
@@ -148,11 +150,11 @@ public class ManageCustomersFormController {
         if (btnSave.getText().equalsIgnoreCase("save")) {
             /*Save Customer*/
             try {
-                if (existCustomer(id)) {
+                if (exsitCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, id + " already exists").show();
                 }
 
-                boolean isSaved = customerDAO.save(new CustomerDTO(id, name, address));
+                boolean isSaved = customerBO.saveCustomer(new CustomerDTO(id, name, address));
 
                 if (isSaved) {
                     tblCustomers.getItems().add(new CustomerTM(id, name, address));
@@ -168,12 +170,12 @@ public class ManageCustomersFormController {
         } else {
             /*Update customer*/
             try {
-                if (!existCustomer(id)) {
+                if (!exsitCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
                 }
                 CustomerDTO dto = new CustomerDTO(id,name,address);
 
-                customerDAO.update(dto);
+                customerBO.updateCustomer(dto);
 
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, "Failed to update the customer " + id + e.getMessage()).show();
@@ -191,9 +193,9 @@ public class ManageCustomersFormController {
     }
 
 
-    boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
+    boolean exsitCustomer(String id) throws SQLException, ClassNotFoundException {
 
-        return customerDAO.exsit(id);
+        return customerBO.exsitCustomer(id);
 
     }
 
@@ -202,11 +204,11 @@ public class ManageCustomersFormController {
         /*Delete Customer*/
         String id = tblCustomers.getSelectionModel().getSelectedItem().getId();
         try {
-            if (!existCustomer(id)) {
+            if (!exsitCustomer(id)) {
                 new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
             }
 
-            customerDAO.delete(id);
+            customerBO.deleteCustomer(id);
 
             tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
             tblCustomers.getSelectionModel().clearSelection();
@@ -221,7 +223,7 @@ public class ManageCustomersFormController {
 
     private String generateNewId() {
         try {
-            return customerDAO.generateNewId();
+            return customerBO.generateNewId();
 
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();

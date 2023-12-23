@@ -47,7 +47,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     }
     @Override
-    public ResultSet generateNewId() throws SQLException, ClassNotFoundException {
+    public String generateNewId() throws SQLException, ClassNotFoundException {
         ResultSet rst = SQLUtil.execute("SELECT id FROM Customer ORDER BY id DESC LIMIT 1;");
         if (rst.next()) {
             String id = rst.getString("id");
